@@ -79,6 +79,7 @@ public class FarmCollectorServiceImpl implements FarmCollectorService {
 		FarmDetail detail = farm.getFarmDetail();
 		resp.setFarmName(detail.getFarmName());
 		resp.setSeason(detail.getSeason());
+		resp.setPlantingArea(detail.getPlantingArea());
 
 		List<CropDto> crops = new ArrayList<>();
 		detail.getCrop().stream().forEach(crop -> {
