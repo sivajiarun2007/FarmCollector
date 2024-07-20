@@ -11,18 +11,15 @@ import com.farm.collector.entity.FarmDetail;
 import com.farm.collector.model.CropDto;
 import com.farm.collector.model.FarmDetailsRequest;
 import com.farm.collector.model.FarmDetailsResponse;
-import com.farm.collector.repository.FarmDetailsRepository;
 import com.farm.collector.repository.FarmRepository;
 
 @Service
 public class FarmCollectorServiceImpl implements FarmCollectorService {
 
 	private FarmRepository farmRepository;
-	private FarmDetailsRepository farmDetailsRepository;
 
-	public FarmCollectorServiceImpl(FarmRepository farmRepository, FarmDetailsRepository farmDetailsRepository) {
+	public FarmCollectorServiceImpl(FarmRepository farmRepository) {
 		this.farmRepository = farmRepository;
-		this.farmDetailsRepository = farmDetailsRepository;
 	}
 
 	@Override
@@ -77,7 +74,6 @@ public class FarmCollectorServiceImpl implements FarmCollectorService {
 	}
 
 	private FarmDetailsResponse constructFarmDetailsResp(Farm farm) {
-		FarmDetailsResponse response = new FarmDetailsResponse();
 		FarmDetailsResponse resp = new FarmDetailsResponse();
 		resp.setOwnerName(farm.getOwnerName());
 		FarmDetail detail = farm.getFarmDetail();
@@ -95,7 +91,7 @@ public class FarmCollectorServiceImpl implements FarmCollectorService {
 
 		resp.setCrops(crops);
 
-		return response;
+		return resp;
 	}
 
 	private Farm constructFarmRo(FarmDetailsRequest farmDetailsRequest) {
