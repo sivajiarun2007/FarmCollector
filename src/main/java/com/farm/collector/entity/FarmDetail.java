@@ -15,9 +15,9 @@ public class FarmDetail {
 	
 	@Id
 	private Long id;
-	
-	
+	private String farmName;
 	private Long plantingArea;
+	private String season;
 	
 	@OneToMany
 	private List<Crop> crop;
