@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.farm.collector.exception.CustomException;
 import com.farm.collector.model.FarmDetailsRequest;
 import com.farm.collector.model.FarmDetailsResponse;
 import com.farm.collector.serviceimpl.FarmCollectorService;
@@ -32,18 +33,26 @@ public class FarmCollectorController {
 	}
 
 	@GetMapping("/get-farm-details-by-season/{season}")
-	public ResponseEntity<List<FarmDetailsResponse>> addFarmDetails(@PathVariable String season) {
+	public ResponseEntity<List<FarmDetailsResponse>> getFarmDetailsBySeason(@PathVariable String season) throws CustomException {
 
 		List<FarmDetailsResponse> response = farmCollectorService.getFarmDetailsBySeason(season);
+		
+		if (response.isEmpty()) {
+			throw new CustomException("No Details found for the given season");
+		}
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
 	}
 
 	@GetMapping("/get-farm-details-by-id/{id}")
-	public ResponseEntity<FarmDetailsResponse> addFarmDetails(@PathVariable Long id) {
+	public ResponseEntity<FarmDetailsResponse> getFarmDetailsById(@PathVariable Long id) throws CustomException {
 
 		FarmDetailsResponse response = farmCollectorService.getFarmDetailsByFarmID(id);
+		
+		if (response == null) {
+			throw new CustomException("No Details found for the given farm");
+		}
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 

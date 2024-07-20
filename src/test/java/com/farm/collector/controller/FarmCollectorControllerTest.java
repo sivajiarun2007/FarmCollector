@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.farm.collector.exception.CustomException;
 import com.farm.collector.model.CropDto;
 import com.farm.collector.model.FarmDetailsRequest;
 import com.farm.collector.model.FarmDetailsResponse;
@@ -134,5 +135,27 @@ public class FarmCollectorControllerTest {
                 .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.error").value("Internal Server Error"))
                 .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
+    }
+    
+    @Test
+    public void tesCustomException1() throws Exception {
+
+        when(farmCollectorService.getFarmDetailsByFarmID(anyLong())).thenReturn(null);
+
+        mockMvc.perform(get("/get-farm-details-by-id/{id}", 1L))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.error").value("No data found"))
+                .andExpect(jsonPath("$.message").value("No Details found for the given farm"));
+    }
+    
+    @Test
+    public void tesCustomException2() throws Exception {
+
+    	when(farmCollectorService.getFarmDetailsBySeason(anyString())).thenReturn(List.of());
+
+        mockMvc.perform(get("/get-farm-details-by-season/{season}", "summer"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.error").value("No data found"))
+                .andExpect(jsonPath("$.message").value("No Details found for the given season"));
     }
 }

@@ -7,10 +7,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.farm.collector.exception.CustomException;
+
 
 @RestController
 @ControllerAdvice
 public class FarmCollectorControllerAdvice {
+	
+	@ExceptionHandler(CustomException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("No data found", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
 
 
     @ExceptionHandler(Exception.class)
