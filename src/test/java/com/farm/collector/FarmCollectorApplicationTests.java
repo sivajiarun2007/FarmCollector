@@ -1,4 +1,4 @@
-package com.farm.collection.FarmCollector;
+package com.farm.collector;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

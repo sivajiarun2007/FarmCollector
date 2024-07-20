@@ -8,23 +8,94 @@ import org.springframework.stereotype.Service;
 import com.farm.collector.entity.Crop;
 import com.farm.collector.entity.Farm;
 import com.farm.collector.entity.FarmDetail;
+import com.farm.collector.model.CropDto;
 import com.farm.collector.model.FarmDetailsRequest;
-import com.farm.collector.repository.FarmCollectorRepository;
+import com.farm.collector.model.FarmDetailsResponse;
+import com.farm.collector.repository.FarmDetailsRepository;
+import com.farm.collector.repository.FarmRepository;
 
 @Service
 public class FarmCollectorServiceImpl implements FarmCollectorService {
-	
-	private FarmCollectorRepository farmCollectorRepository;
-	
-	public FarmCollectorServiceImpl(FarmCollectorRepository farmCollectorRepository) {
-		this.farmCollectorRepository = farmCollectorRepository;
+
+	private FarmRepository farmRepository;
+	private FarmDetailsRepository farmDetailsRepository;
+
+	public FarmCollectorServiceImpl(FarmRepository farmRepository, FarmDetailsRepository farmDetailsRepository) {
+		this.farmRepository = farmRepository;
+		this.farmDetailsRepository = farmDetailsRepository;
 	}
 
 	@Override
 	public void addFarmDetails(FarmDetailsRequest farmDetailsRequest) {
 		Farm farmRo = constructFarmRo(farmDetailsRequest);
-		farmCollectorRepository.save(farmRo);
+		farmRepository.save(farmRo);
 
+	}
+
+	@Override
+	public FarmDetailsResponse getFarmDetailsByFarmID(Long id) {
+		if(farmRepository.findById(id).isPresent()) {
+			return constructFarmDetailsResp(farmRepository.findById(id).get());
+		}
+		return null;
+		
+	}
+
+	@Override
+	public List<FarmDetailsResponse> getFarmDetailsBySeason(String season) {
+		List<Farm> farm = farmRepository.findFarmDetailsBySeason(season);
+		return constructFarmDetailsResp(farm);
+	}
+
+	private List<FarmDetailsResponse> constructFarmDetailsResp(List<Farm> farms) {
+		List<FarmDetailsResponse> response = new ArrayList<>();
+
+		farms.stream().forEach(farm -> {
+			FarmDetailsResponse resp = new FarmDetailsResponse();
+			resp.setOwnerName(farm.getOwnerName());
+			FarmDetail detail = farm.getFarmDetail();
+			resp.setFarmName(detail.getFarmName());
+			resp.setSeason(detail.getSeason());
+			resp.setPlantingArea(detail.getPlantingArea());
+
+			List<CropDto> crops = new ArrayList<>();
+			detail.getCrop().stream().forEach(crop -> {
+				CropDto dto = new CropDto();
+				dto.setCropName(crop.getCropName());
+				dto.setActualHarvest(crop.getActualHarvest());
+				dto.setExpectedOutcome(crop.getExpectedOutcome());
+				crops.add(dto);
+			});
+
+			resp.setCrops(crops);
+
+			response.add(resp);
+
+		});
+
+		return response;
+	}
+
+	private FarmDetailsResponse constructFarmDetailsResp(Farm farm) {
+		FarmDetailsResponse response = new FarmDetailsResponse();
+		FarmDetailsResponse resp = new FarmDetailsResponse();
+		resp.setOwnerName(farm.getOwnerName());
+		FarmDetail detail = farm.getFarmDetail();
+		resp.setFarmName(detail.getFarmName());
+		resp.setSeason(detail.getSeason());
+
+		List<CropDto> crops = new ArrayList<>();
+		detail.getCrop().stream().forEach(crop -> {
+			CropDto dto = new CropDto();
+			dto.setCropName(crop.getCropName());
+			dto.setActualHarvest(crop.getActualHarvest());
+			dto.setExpectedOutcome(crop.getExpectedOutcome());
+			crops.add(dto);
+		});
+
+		resp.setCrops(crops);
+
+		return response;
 	}
 
 	private Farm constructFarmRo(FarmDetailsRequest farmDetailsRequest) {
@@ -49,7 +120,7 @@ public class FarmCollectorServiceImpl implements FarmCollectorService {
 
 		farm.setOwnerName(farmDetailsRequest.getOwnerName());
 		farm.setFarmDetail(farmDetail);
-		
+
 		return farm;
 
 	}
