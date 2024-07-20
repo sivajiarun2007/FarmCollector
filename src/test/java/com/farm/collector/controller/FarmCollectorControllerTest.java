@@ -124,4 +124,15 @@ public class FarmCollectorControllerTest {
                 .andExpect(jsonPath("$.crops[0].actualHarvest").value(90))
                 .andExpect(jsonPath("$.crops[0].expectedOutcome").value(100));
     }
+    
+    @Test
+    public void testGetFarmDetailsByIdThrowsException() throws Exception {
+
+        when(farmCollectorService.getFarmDetailsByFarmID(anyLong())).thenThrow(NullPointerException.class);
+
+        mockMvc.perform(get("/get-farm-details-by-id/{id}", 1L))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.error").value("Internal Server Error"))
+                .andExpect(jsonPath("$.message").value("An unexpected error occurred"));
+    }
 }
